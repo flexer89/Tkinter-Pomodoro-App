@@ -1,5 +1,7 @@
 import os
 import sys
+import tkinter
+import tkinter.messagebox
 from settings import *
 
 path = getattr(sys, '_MEIPASS', os.getcwd())
@@ -7,12 +9,22 @@ os.chdir(path)
 
 
 # ---------------------------- SOUND MECHANISM ----------------------------------- #
-def preview_play_sound(sound_to_play):
-    sound_to_play.play(maxtime=2000)
+
+def set_sound(sound_to_set):
+    global main_sound
+    main_sound = sound_to_set
+
+
+def play_sound():
+    if main_sound.get_length() <= 1:
+        main_sound.play()
+    else:
+        main_sound.play(loops=work_interval.get())
 
 
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 def countdown(time_sec):
+
     # Label change
     start_button.config(text="Focus time",
                         background=background,
@@ -32,8 +44,7 @@ def countdown(time_sec):
     # When timer is gone
     if time_sec == 0:
         root.after_cancel(counter)
-        points.set(work_interval.get())
-        points_amount_label.config(text=points.get())
+        main_sound.stop()
         break_countdown(break_interval.get() * 60)
 
 
@@ -52,7 +63,7 @@ def break_countdown(time_sec):
         root.after_cancel(counter)
 
         # Label change
-        minutes, seconds = divmod(work_interval.get()*60, 60)
+        minutes, seconds = divmod(work_interval.get() * 60, 60)
         timer = '{:02d}:{:02d}'.format(minutes, seconds)
         countdown_label.config(text=timer)
         start_button.config(text="Start",
@@ -60,7 +71,7 @@ def break_countdown(time_sec):
                             foreground=background,
                             activebackground=ACTIVE_BACKGROUND,
                             command=lambda: countdown(work_interval.get() * 60))
-        shop_button.config(image=shop_image)
+        shop_button.config(image=statistics_image)
         settings_button.config(image=settings_image)
 
 
@@ -76,17 +87,6 @@ def settings_click_off():
     settings_frame.pack_forget()
     main_frame.pack()
     countdown_label.config(text=f"{work_interval.get()}:00")
-
-
-# shop frame on/off
-def shop_click_on():
-    main_frame.pack_forget()
-    shop_frame.pack()
-
-
-def shop_click_off():
-    shop_frame.pack_forget()
-    main_frame.pack()
 
 
 def time_label_update(time_sec):
@@ -108,7 +108,7 @@ def change_theme(bg_col, image):
                 widget.config(activebackground=bg_col)
 
     for widget in settings_frame.winfo_children():
-        if isinstance(widget, (tk.Label, tk.Frame)) and widget["background"] == background:
+        if isinstance(widget, (tk.Label, tk.Frame, tkinter.Spinbox)) and widget["background"] == background:
             widget.config(background=bg_col)
         if isinstance(widget, tk.Button):
             if widget["background"] == background:
@@ -116,14 +116,6 @@ def change_theme(bg_col, image):
             if widget["activebackground"] == background:
                 widget.config(activebackground=bg_col)
 
-    for widget in shop_frame.winfo_children():
-        if isinstance(widget, (tk.Label, tk.Frame, tk.LabelFrame)) and widget["background"] == background:
-            widget.config(background=bg_col)
-        if isinstance(widget, tk.Button):
-            if widget["background"] == background:
-                widget.config(background=bg_col)
-            if widget["activebackground"] == background:
-                widget.config(activebackground=bg_col)
     for widget in sound_label.winfo_children():
         if isinstance(widget, tk.Button):
             if widget["background"] == background:
@@ -131,11 +123,15 @@ def change_theme(bg_col, image):
             if widget["activebackground"] == background:
                 widget.config(activebackground=bg_col)
 
+    for widget in theme_frame.winfo_children():
+        if isinstance(widget, tk.LabelFrame):
+            if widget["background"] == background:
+                widget.config(background=bg_col)
+
     background = bg_col
     start_button.config(foreground=background)
     main_frame.config(background=background)
     settings_frame.config(background=background)
-    shop_frame.config(background=background)
     root.config(background=background)
     main_image_label.config(image=image)
 
@@ -170,7 +166,7 @@ start_button = tk.Button(main_frame,
                          border=0,
                          width=15,
                          font=(FONT_NAME, 16),
-                         command=lambda: countdown(work_interval.get() * 60))
+                         command=lambda: [countdown(work_interval.get() * 60), play_sound()])
 start_button.grid(row=2,
                   column=1,
                   ipady=5,
@@ -196,10 +192,9 @@ shop_button = tk.Button(main_frame,
                         text="",
                         background=background,
                         activeforeground=background,
-                        image=shop_image,
+                        image=statistics_image,
                         activebackground=background,
-                        border=0,
-                        command=shop_click_on)
+                        border=0)
 shop_button.grid(row=3,
                  column=2,
                  sticky='SE',
@@ -219,17 +214,20 @@ work_length_label = tk.Label(settings_frame,
                              background=background)
 work_length_label.grid(row=1,
                        column=0,
+                       sticky='W',
                        pady=(100, 0))
 
 work_length_spinbox = tk.Spinbox(settings_frame,
                                  from_=1,
                                  to=180,
                                  width=5,
+                                 background=background,
+                                 foreground=FONT_COLOR,
                                  textvariable=work_interval,
                                  command=lambda: print(work_interval.get()))
 work_length_spinbox.grid(row=1,
                          column=1,
-                         padx=40,
+                         sticky='E',
                          pady=(100, 0))
 
 # Break length label
@@ -246,87 +244,57 @@ break_length_spinbox = tk.Spinbox(settings_frame,
                                   from_=1,
                                   to=15,
                                   width=5,
+                                  background=background,
+                                  foreground=FONT_COLOR,
                                   textvariable=break_interval,
                                   command=lambda: time_label_update(work_interval.get()))
 break_length_spinbox.grid(row=2,
-                          column=1)
+                          column=1,
+                          sticky='E')
 
-# Close button
-settings_close_button = tk.Button(settings_frame,
-                                  text="",
-                                  image=close_image,
-                                  background=background,
-                                  border=0,
-                                  activebackground=background,
-                                  command=settings_click_off)
-
-settings_close_button.grid(row=3,
-                           column=0,
-                           sticky='E',
-                           pady=(330, 0))
-# --------------------------- SHOP FRAME SETUP --------------------------------- #
-shop_frame = tk.Frame(root, width=400, height=600)
-shop_frame.config(background=background)
-shop_frame.columnconfigure(0, weight=1)
-shop_frame.columnconfigure(1, weight=2)
-shop_frame.columnconfigure(2, weight=1)
-
-# Points label
-points_label = tk.Label(shop_frame,
-                        text="My points",
-                        background=background,
-                        foreground=FONT_COLOR,
-                        font=(FONT_NAME, 20))
-points_label.grid(row=0)
-
-points_amount_label = tk.Label(shop_frame,
-                               text=points.get(),
-                               background=background,
-                               foreground=FONT_COLOR,
-                               font=(FONT_NAME, 40))
-points_amount_label.grid(row=1)
+theme_frame = tk.Frame(settings_frame, background=background)
 
 # color display frame
-color_label = tk.LabelFrame(shop_frame,
-                            text="Theme",
-                            labelanchor='n',
-                            background=background,
-                            foreground=FONT_COLOR,
-                            font=(FONT_NAME, 16))
-color_label.grid(row=2,
-                 column=0,
-                 pady=30)
+shop_color_label = tk.LabelFrame(theme_frame,
+                                 text="Theme",
+                                 labelanchor='n',
+                                 background=background,
+                                 foreground=FONT_COLOR,
+                                 font=(FONT_NAME, 16))
+shop_color_label.grid(row=0,
+                      column=0,
+                      pady=30)
 
 # Create background button
 for color in background_color:
-    btn = tk.Button(color_label,
+    btn = tk.Button(shop_color_label,
                     background=color,
                     activebackground=color,
                     width=5,
                     border=1,
                     relief="ridge")
-    btn.grid(row=3,
+    btn.grid(row=1,
              column=background_color.index(color) + 1, pady=10)
     background_color_buttons.append(btn)
 
-background_color_buttons[0].config(command=lambda: change_theme(background_color[0], berry_image))
-background_color_buttons[1].config(command=lambda: change_theme(background_color[1], pear_image))
-background_color_buttons[2].config(command=lambda: change_theme(background_color[2], coconut_image))
-background_color_buttons[3].config(command=lambda: change_theme(background_color[3], banana_image))
-background_color_buttons[4].config(command=lambda: change_theme(background_color[4], blackberries_image))
+background_color_buttons[0].config(command=lambda: change_theme(background_color[0], tomato_image))
+background_color_buttons[1].config(command=lambda: change_theme(background_color[1], berry_image))
+background_color_buttons[2].config(command=lambda: change_theme(background_color[2], pear_image))
+background_color_buttons[3].config(command=lambda: change_theme(background_color[3], coconut_image))
+background_color_buttons[4].config(command=lambda: change_theme(background_color[4], banana_image))
 
 # Add side padding
 background_color_buttons[0].grid_configure(padx=(30, 0))
 background_color_buttons[len(background_color_buttons) - 1].grid_configure(padx=(0, 30))
 
 # Sounds label
-sound_label = tk.LabelFrame(shop_frame,
+sound_label = tk.LabelFrame(theme_frame,
                             text="Sound",
                             labelanchor='n',
                             background=background,
                             foreground=FONT_COLOR,
                             font=(FONT_NAME, 16))
-sound_label.grid(row=4,
+sound_label.grid(row=2,
                  column=0,
                  pady=30)
 
@@ -345,21 +313,24 @@ for sound in background_sound:
 background_sound_buttons[0].grid_configure(padx=(30, 0))
 background_sound_buttons[len(background_sound_buttons) - 1].grid_configure(padx=(0, 30))
 
-background_sound_buttons[0].configure(image=rain_image, command=lambda: preview_play_sound(rain_sound))
-background_sound_buttons[1].configure(image=forest_image, command=lambda: preview_play_sound(forest_sound))
-background_sound_buttons[2].configure(image=sea_image, command=lambda: preview_play_sound(sea_sound))
-background_sound_buttons[3].configure(image=bird_image, command=lambda: preview_play_sound(bird_sound))
-background_sound_buttons[4].configure(image=flame_image, command=lambda: preview_play_sound(fireplace_sound))
+background_sound_buttons[0].configure(image=none_image)
+background_sound_buttons[1].configure(image=forest_image, command=lambda: set_sound(forest_sound))
+background_sound_buttons[2].configure(image=sea_image, command=lambda: set_sound(sea_sound))
+background_sound_buttons[3].configure(image=bird_image, command=lambda: set_sound(bird_sound))
+background_sound_buttons[4].configure(image=flame_image, command=lambda: set_sound(fireplace_sound))
 
 # Close button
-shop_close_button = tk.Button(shop_frame,
-                              image=close_image,
-                              background=background,
-                              border=0,
-                              activebackground=background,
-                              command=shop_click_off)
-
-shop_close_button.grid(row=6,
-                       pady=(100, 0))
+settings_close_button = tk.Button(settings_frame,
+                                  text="",
+                                  image=close_image,
+                                  background=background,
+                                  border=0,
+                                  activebackground=background,
+                                  command=settings_click_off)
+settings_close_button.grid(row=5,
+                           columnspan=2,
+                           pady=50)
+theme_frame.grid(row=4,
+                 columnspan=2)
 
 root.mainloop()

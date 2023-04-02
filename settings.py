@@ -16,30 +16,28 @@ FONT_COLOR = "#FFFFFF"
 # ---------------------------- SETTINGS --------------------------------- #
 work_interval = tk.IntVar(value=1)
 break_interval = tk.IntVar(value=1)
-points = tk.IntVar(value=0)
-background_color = ["#002B5B", "#4E944F", "#865439", "#E0A526", "#2C3333"]
+background_color = ["#EA5455", "#002B5B", "#4E944F", "#865439", "#E0A526"]
 background_color_buttons = []
 background_sound = ["sound/rain_sound.mp3", "sound/night_forest.mp3", "sound/sea_sound.mp3", "sound/bird_sound.mp3", "sound/fireplace_sound.mp3"]
 background_sound_buttons = []
-bought_color = []
-bought_buttons = []
 mixer.init()
+main_sound = mixer.Sound("sound/beep_sound.mp3")
 
 # Images
 settings_image = tk.PhotoImage(file="icons/settings_button.png")
 close_image = tk.PhotoImage(file="icons/close_button.png")
-shop_image = tk.PhotoImage(file="icons/shop_button.png")
+statistics_image = tk.PhotoImage(file="icons/statistics_button.png")
 tomato_image = tk.PhotoImage(file="images/tomato.png")  # Red
 berry_image = tk.PhotoImage(file="images/berry.png")  # Dark blue
 pear_image = tk.PhotoImage(file="images/pear.png")  # Green
 coconut_image = tk.PhotoImage(file="images/coconut.png")  # Brown
 banana_image = tk.PhotoImage(file="images/banana.png")  # Yellow
-blackberries_image = tk.PhotoImage(file="images/blackberry.png")  # Black
 rain_image = tk.PhotoImage(file="icons/rain_button.png")
 forest_image = tk.PhotoImage(file="icons/forest_button.png")
 sea_image = tk.PhotoImage(file="icons/sea_button.png")
 bird_image = tk.PhotoImage(file="icons/bird_button.png")
 flame_image = tk.PhotoImage(file="icons/flame_button.png")
+none_image = tk.PhotoImage(file="icons/none_button.png")
 
 # Sounds
 bird_sound = mixer.Sound("sound/bird_sound.mp3")
