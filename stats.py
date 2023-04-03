@@ -1,14 +1,7 @@
 import matplotlib.pyplot as plt
 import csv
-import seaborn as sns
-from datetime import datetime, timedelta
-
-import numpy as np
-
+from datetime import datetime
 from settings import *
-import pandas as pd
-import calmap
-import calplot
 
 
 def is_hours(expected_time, time):

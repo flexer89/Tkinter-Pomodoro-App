@@ -51,6 +51,7 @@ fireplace_sound = pygame.mixer.Sound("sound/fireplace_sound.mp3")
 forest_sound = pygame.mixer.Sound("sound/night_forest.mp3")
 sea_sound = pygame.mixer.Sound("sound/sea_sound.mp3")
 rain_sound = pygame.mixer.Sound("sound/rain_sound.mp3")
+ping_sound = pygame.mixer.Sound("sound/ping_sound.mp3")
 
 # Label text
 total_time = total_focus()

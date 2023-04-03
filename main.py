@@ -4,6 +4,7 @@ from stats import *
 
 # ---------------------------- SOUND MECHANISM ----------------------------------- #
 
+
 def set_sound(sound_to_set):
     global main_sound
     main_sound = sound_to_set
@@ -36,6 +37,7 @@ def countdown(time_sec):
 
     # When timer is gone
     if time_sec == 0:
+        ping_sound.play()
         root.after_cancel(counter)
         main_sound.stop()
         today_date = datetime.today().strftime('%Y-%m-%d')
@@ -292,15 +294,21 @@ for color in background_color:
              column=background_color.index(color) + 1, pady=10)
     background_color_buttons.append(btn)
 
-background_color_buttons[0].config(command=lambda: change_theme(background_color[0], tomato_image))
-background_color_buttons[1].config(command=lambda: change_theme(background_color[1], berry_image))
-background_color_buttons[2].config(command=lambda: change_theme(background_color[2], pear_image))
-background_color_buttons[3].config(command=lambda: change_theme(background_color[3], coconut_image))
-background_color_buttons[4].config(command=lambda: change_theme(background_color[4], raspberry_image))
+background_color_buttons[0].config(
+    command=lambda: change_theme(background_color[0], tomato_image))
+background_color_buttons[1].config(
+    command=lambda: change_theme(background_color[1], berry_image))
+background_color_buttons[2].config(
+    command=lambda: change_theme(background_color[2], pear_image))
+background_color_buttons[3].config(
+    command=lambda: change_theme(background_color[3], coconut_image))
+background_color_buttons[4].config(
+    command=lambda: change_theme(background_color[4], raspberry_image))
 
 # Add side padding
 background_color_buttons[0].grid_configure(padx=(30, 0))
-background_color_buttons[len(background_color_buttons) - 1].grid_configure(padx=(0, 30))
+background_color_buttons[len(
+    background_color_buttons) - 1].grid_configure(padx=(0, 30))
 
 # Sounds label
 sound_label = tk.LabelFrame(theme_frame,
@@ -326,13 +334,18 @@ for sound in background_sound:
              padx=8)
 
 background_sound_buttons[0].grid_configure(padx=(30, 0))
-background_sound_buttons[len(background_sound_buttons) - 1].grid_configure(padx=(0, 30))
+background_sound_buttons[len(
+    background_sound_buttons) - 1].grid_configure(padx=(0, 30))
 
 background_sound_buttons[0].configure(image=none_image)
-background_sound_buttons[1].configure(image=forest_image, command=lambda: set_sound(forest_sound))
-background_sound_buttons[2].configure(image=sea_image, command=lambda: set_sound(sea_sound))
-background_sound_buttons[3].configure(image=bird_image, command=lambda: set_sound(bird_sound))
-background_sound_buttons[4].configure(image=flame_image, command=lambda: set_sound(fireplace_sound))
+background_sound_buttons[1].configure(
+    image=forest_image, command=lambda: set_sound(forest_sound))
+background_sound_buttons[2].configure(
+    image=sea_image, command=lambda: set_sound(sea_sound))
+background_sound_buttons[3].configure(
+    image=bird_image, command=lambda: set_sound(bird_sound))
+background_sound_buttons[4].configure(
+    image=flame_image, command=lambda: set_sound(fireplace_sound))
 
 # Close button
 settings_close_button = tk.Button(settings_frame,
